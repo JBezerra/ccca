@@ -7,26 +7,29 @@ export default class Order {
     private cpf: Cpf;
     private coupon: Coupon | undefined;
     private orderItems: OrderItem[];
-    private shipping: number = 0;
-
+    private freight: number;
 
     constructor (cpf: string, readonly issueDate: Date = new Date()) {
         this.cpf = new Cpf(cpf);
         this.orderItems = [];
+        this.freight = 0;
     }
 
     addItem(item: Item, quantity: number) {
-        this.shipping += item.getShipping() * quantity;
+        this.freight += item.getFreight() * quantity;
         this.orderItems.push(new OrderItem(item.idItem, item.price, quantity));
     }
 
     addCoupon (coupon: Coupon) {
-        if(!coupon.isExpired(this.issueDate)){
-            this.coupon = coupon;
-        }
+        if (coupon.isExpired(this.issueDate)) return;
+        this.coupon = coupon;
     }
 
-    getTotal() {
+    getFreight () {
+        return this.freight;
+    }
+
+    getTotal () {
         let total = 0;
         for (const orderItem of this.orderItems) {
             total += orderItem.getTotal();
@@ -37,7 +40,11 @@ export default class Order {
         return total;
     }
 
-    getShippingTotal() {
-        return this.shipping;
+    getCode () {
+        const todayYear = new Date().getFullYear();
+        const MIN_NUMBER = 10000000;
+        const MAX_NUMBER = 99999999;
+        const codeNumber = Math.floor(Math.random() * (MAX_NUMBER - MIN_NUMBER)) + MAX_NUMBER;
+        return `${todayYear}${codeNumber}`
     }
 }

@@ -4,6 +4,7 @@ export default class Coupon {
     }
 
     isExpired (today: Date = new Date()) {
-        return this.expireDate && this.expireDate.getTime() < today.getTime();
+        if (!this.expireDate) return false;
+        return this.expireDate.getTime() < today.getTime();
     }
 }
